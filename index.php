@@ -139,9 +139,80 @@ foreach($mesdonnees as $montableau) {
     echo $montableau['author'];
 }
 
-//var_dump($mesdonnees);
+/* 
+MAINTENANT, on a envie de faire des requêtes en modification dans sa base données Donc soit des INSERT, des DELETE, ou bien des UPDATE
+*/
 
+$sql = "INSERT INTO article (`title`, `content`, `author`, `date`, `category`) VALUES ('Mon chien est débile, que faire ?', 'tralalalal lalala', 'Mathilde Renversade', '2023-03-14', 'Conseil')";
 
+$results_modif = $connexionPDO->exec($sql);
 
+var_dump($results_modif);
+echo '<br>';
 
+$title = 'Je suis un chien gentil';
+$author = "Manon des Sources";
+$content = "ludofififif fifififif";
+$category = "Agility";
+$date = "2023-03-13";
+
+$sql = "INSERT into article (`title`, `content`, `author`, `date`, `category`) VALUES ('$title', '{$content}', '$author', '$date', '$category');";
+
+$results_modif_deux = $connexionPDO->exec($sql);
+
+var_dump($results_modif_deux);
+echo '<br>';
+
+$sql = "DELETE FROM article WHERE id=2";
+
+$results_suppression = $connexionPDO->exec($sql);
+
+// Attention, bien penser à intégrer dans son code, la gestion des erreurs, c'est-à-dire que se passe-t-il si jamais le retour de ma méthode exec ou query est égal à 0 ? 
+var_dump($results_suppression);
+
+/*
+LES REQUETES PREPAREES
+
+Dès lors que je manipule des données qui m'ont été fournies par un utilisateur (via un formulaire par exemple) et que je veux les utiliser dans ma base de données, j'utilise les requêtes préparées. Elles sont un moyen de sécuriser mon code et de ne pas subir d'injection SQL
+
+Exemple de mise en place d'une requête préparée
+*/
+
+$title = 'Je suis un titre écrit par un utilisateur';
+$content = "Mon contenu venant d'un input";
+$author = 'Utilisateur connecté';
+$date = '2023-03-14';
+$category = 'Soin';
+
+$sql = "INSERT into article (`title`, `content`, `author`, `date`, `category`) VALUES (:title, :content, :author, '2023-03-14', 'Loisirs');";
+
+$result_prepare = $connexionPDO->prepare($sql);
+$result_prepare->bindParam(':title', $title);
+$result_prepare->bindParam(':content', $content);
+$result_prepare->bindParam(':author', $author);
+$result_prepare_done = $result_prepare->execute();
+
+echo '<br>';
+var_dump($result_prepare_done);
+
+/* RECAPITULATIF
+
+Pour me connecter à une base de données et développer mes composants d'accès aux données, je peux utiliser via la programmation orientée objet 2 classe : PDO et MySQLI
+
+Pour créer la connexion, j'instancie mon objet et je lui passe en paramètres les "moyens" de connexion : l'adresse du serveur de base données, (parfois le port, exemple pour un serveur mysql c'est souvent 3306 et pour mariabd c'est souvent 3308), le nom de la BDD, le user de la BDD, du mot de passe de ce user, et dans le cas de PDO, on a aussi besoin du type de moteur de BDD (mysql, postgred, etc)
+
+- Si je veux LIRE les données contenues dans ma BDD, j'utilise la méthode query(). Si je veux MODIFIER ma BDD, j'utilise la méthode exec()
+
+- Une fois query() ou exec() exécuté, je récupère un autre type d'objet (PDOStatement, mysqli_result), sorte de "boîte de résultats".
+
+- C'est sur cette "boîte de résultats" que j'utilise les méthodes fetch ou fetchAll (en fonction du nombre de résultats que je veux récupérer)
+Et via les paramètres de ces 2 méthodes, je peux préciser le format dans lequel je veux ces résultats. 
+
+- Dans tous les cas, où j'exécute des requêtes SQL dont des valeurs sont issues d'inputs utilisateurs, j'utilise les requêtes préparées et donc les méthodes
+1) prepare()
+2) bindValue() / bindParam()
+3) execute()
+NEVER TRUST THE USER INPUT 
+Les requêtes préparées nous protègent des injections SQL.
+*/
 ;?>
