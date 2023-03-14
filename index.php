@@ -67,5 +67,50 @@ if($result->num_rows > 0){
 $connexion->close();
 
 
+/* 
+    Exemple de connexion et de récupération des informations contenues dans ma BDD avec cette fois-ci l'extension PDO
+*/
+$dbname = "sandbox";
+//   1) DSN
+$dsn = "mysql:host=mysql;dbname=".$dbname;
+//    2) le user de connexion à la base de données
+$username = "sandbox";
+//    4) le mot de passe de la base données
+$password = "sandbox";
+
+// Créer une connexion avec PDO
+
+try{
+    $connexionPDO = new PDO($dsn, $username, $password);
+    echo 'La connexion s\'est bien passée';
+} catch (PDOException $e) {
+    print "Erreur !: $e->getMessage() <br/>";
+    die();
+}
+
+$sql = "SELECT * from article";
+
+$results = $connexionPDO->query($sql);
+echo '<br>';
+//var_dump($results);
+echo '<br>';
+$mesdonnees = $results->fetchAll(PDO::FETCH_ASSOC);
+
+foreach($mesdonnees as $montableau) {
+    //var_dump($montableau);
+    echo '<br>';
+    echo $montableau['id'];
+    echo '<br>';
+    echo $montableau['title'];
+    echo '<br>';
+    echo $montableau['content'];
+    echo '<br>';
+    echo $montableau['author'];
+}
+
+//var_dump($mesdonnees);
+
+
+
 
 ;?>
